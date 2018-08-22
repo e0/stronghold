@@ -1,6 +1,7 @@
 {-# LANGUAGE DataKinds #-}
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE TypeApplications #-}
+
 module Frontend where
 
 import qualified Data.Text as T
@@ -17,3 +18,5 @@ frontend = (head', body)
       text "Welcome to Obelisk!"
       el "p" $ text $ T.pack commonStuff
       elAttr "img" ("src" =: static @"obelisk.jpg") blank
+      el "div" $ text "ok"
+      button "Click me" >>= count >>= display
