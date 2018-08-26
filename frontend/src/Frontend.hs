@@ -49,6 +49,29 @@ frontend = (head', body)
             evIncr <- button "Increment"
             el "span" $ display numbs
         return ()
+        rec el "h2" $ text "Combining Events with leftmost"
+            counts <-
+              foldDyn (+) (0 :: Int) $ leftmost [1 <$ evIncr, -1 <$ evDecr]
+            el "div" $ display counts
+            evIncr <- button "Increment"
+            evDecr <- button "Decrement"
+        return ()
+        rec el "h2" $ text "Combining Events with mergeWith"
+            dynCount <-
+              foldDyn (+) (0 :: Int) (mergeWith (+) [1 <$ evIncr, -1 <$ evDecr])
+            el "div" $ display dynCount
+            evIncr <- button "Increment"
+            evDecr <- button "Decrement"
+        return ()
+        rec el "h2" $ text "Using foldDyn with function application"
+            dynNum <-
+              foldDyn ($) (0 :: Int) $
+              leftmost [(+ 1) <$ evIncr, (+ (-1)) <$ evDecr, const 0 <$ evReset]
+            el "div" $ display dynNum
+            evIncr <- button "Increment"
+            evDecr <- button "Decrement"
+            evReset <- button "Reset"
+        return ()
 
 attrsCSS :: Map.Map T.Text T.Text
 attrsCSS = ("href" =: static @"style.css") <> ("rel" =: "stylesheet")
