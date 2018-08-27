@@ -21,7 +21,7 @@ frontend = (head', body)
       elAttr "link" attrsCSS blank
     body = do
       elAttr "div" ("class" =: "column") $ do
-        text "Welcome to Obelisk!"
+        el "h1" $ text "Welcome to Obelisk!"
         el "p" $ text $ T.pack commonStuff
         elAttr "img" ("src" =: static @"obelisk.jpg") blank
         el "div" $ text "ok"
@@ -32,7 +32,7 @@ frontend = (head', body)
             el "li" $ text "Not difficult"
             el "li" $ text "Efficient"
       elAttr "div" ("class" =: "column") $ do
-        el "h1" $ text "A link to DuckDuckGo in a new tab"
+        el "h1" $ text "Intro examples"
         elAttr "a" attrsLink $ text "DuckDuckGo"
         elClass "h2" "sub-title" $ text "This is a sub title"
         rec dynBool <- toggle False evClick
@@ -72,6 +72,39 @@ frontend = (head', body)
             evDecr <- button "Decrement"
             evReset <- button "Reset"
         return ()
+      elAttr "div" ("class" =: "column") $ do
+        el "h1" $ text "Predefined input widgets"
+        el "h2" $ text "Text Input - Configuration"
+        el "h3" $ text "Basic"
+        ti <- textInput $ def
+        dynText $ value ti
+        el "h3" $ text "Max length 7"
+        t1 <- textInput $ def & attributes .~ constDyn ("maxlength" =: "7")
+        dynText $ value t1
+        el "h3" $ text "Initial value"
+        t2 <- textInput $ def & textInputConfig_initialValue .~ "initial"
+        dynText $ value t2
+        el "h3" $ text "Input hint"
+        t3 <-
+          textInput $
+          def & attributes .~ constDyn ("placeholder" =: "type here")
+        dynText $ value t3
+        el "h3" $ text "Password"
+        t4 <- textInput $ def & textInputConfig_inputType .~ "password"
+        dynText $ value t4
+        el "h3" $ text "Multiple attributes (hint + max length)"
+        t5 <-
+          textInput $
+          def & attributes .~
+          constDyn ("placeholder" =: "max 7" <> "maxlength" =: "7")
+        dynText $ value t5
+        el "h3" $ text "Numeric field with initial value"
+        t6 <-
+          textInput $
+          def & textInputConfig_inputType .~ "number" &
+          textInputConfig_initialValue .~
+          "0"
+        dynText $ value t6
 
 attrsCSS :: Map.Map T.Text T.Text
 attrsCSS = ("href" =: static @"style.css") <> ("rel" =: "stylesheet")
