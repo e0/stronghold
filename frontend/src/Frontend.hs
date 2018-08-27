@@ -6,6 +6,7 @@
 module Frontend where
 
 import qualified Data.Map as Map
+import Data.Map
 import qualified Data.Text as T
 import Reflex.Dom.Core
 
@@ -105,6 +106,31 @@ frontend = (head', body)
           textInputConfig_initialValue .~
           "0"
         dynText $ value t6
+        el "h3" $ text "Text input - read value on button click"
+        t7 <- textInput def
+        evClick <- button "click me"
+        el "br" blank
+        text "Contents of TextInput on last click: "
+        let evText = tagPromptlyDyn (value t7) evClick
+        dynText =<< holdDyn "" evText
+        el "h3" $ text "Text input - return value on 'Enter'"
+        t8 <- textInput def
+        el "br" blank
+        text "Contents of TextInput on after 'Enter': "
+        let evEnter = keypress Enter t8
+        let evText = tagPromptlyDyn (value t8) evEnter
+        dynText =<< holdDyn "" evText
+        el "h3" $ text "Write into TextInput"
+        t9 <- textInput def
+        evCopy <- button ">>>"
+        let evText = tagPromptlyDyn (value t9) evCopy
+        t10 <- textInput $ def & setValue .~ evText
+        blank
+        el "h3" $ text "Clear TextInput"
+        evReset <- button "Reset"
+        t11 <- textInput $ def & setValue .~ ("" <$ evReset)
+        blank
+        rgbViewer
 
 attrsCSS :: Map.Map T.Text T.Text
 attrsCSS = ("href" =: static @"style.css") <> ("rel" =: "stylesheet")
@@ -117,3 +143,27 @@ attrsColorToggle b = "style" =: ("color: " <> color b)
   where
     color True = "red"
     color _ = "green"
+
+rgbViewer :: MonadWidget t m => m ()
+rgbViewer = do
+  el "h2" $ text "RGB Viewer"
+  el "div" $ text "Enter RGB component values as numbers between 0 and 255"
+  dfsRed <- labelBox "Red: "
+  dfsGreen <- labelBox "Green: "
+  dfsBlue <- labelBox "Blue: "
+  textArea $
+    def & attributes .~
+    (styleMap <$> value dfsRed <*> value dfsGreen <*> value dfsBlue)
+  return ()
+
+labelBox :: MonadWidget t m => T.Text -> m (TextInput t)
+labelBox label =
+  el "div" $ do
+    text label
+    textInput $
+      def & textInputConfig_inputType .~ "number" & textInputConfig_initialValue .~
+      "0"
+
+styleMap :: T.Text -> T.Text -> T.Text -> Map T.Text T.Text
+styleMap r g b =
+  "style" =: mconcat ["background-color: rgb(", r, ", ", g, ", ", b, ")"]
